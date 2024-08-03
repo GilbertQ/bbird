@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Button, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
-  Paper, 
+import {
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
   Typography,
-  Box
+  Box,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Line } from 'react-chartjs-2';
@@ -95,19 +95,18 @@ const BTotals = () => {
       setSummary({
         total: data.length,
         valid: validCount,
-        invalid: invalidCount
+        invalid: invalidCount,
       });
     };
 
     reader.readAsText(file);
   };
 
-
   useEffect(() => {
     if (csvData.length > 1) {
       // Calculate monthly totals
       const monthlyTotals = {};
-      csvData.slice(1).forEach(row => {
+      csvData.slice(1).forEach((row) => {
         const date = new Date(row[0].replace(/\./g, '-'));
         const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         const price = parseFloat(row[2]);
@@ -123,17 +122,17 @@ const BTotals = () => {
         datasets: [
           {
             label: 'Total by Month',
-            data: sortedMonths.map(month => monthlyTotals[month]),
+            data: sortedMonths.map((month) => monthlyTotals[month]),
             borderColor: 'rgb(75, 192, 192)',
-            tension: 0.1
-          }
-        ]
+            tension: 0.1,
+          },
+        ],
       };
       setChartData(chartData);
 
       // Calculate category totals
       const categoryTotals = {};
-      csvData.slice(1).forEach(row => {
+      csvData.slice(1).forEach((row) => {
         const category = row[1];
         const price = parseFloat(row[2]);
         if (!isNaN(price)) {
@@ -142,7 +141,9 @@ const BTotals = () => {
       });
 
       // Sort categories by total in descending order
-      const sortedCategories = Object.keys(categoryTotals).sort((a, b) => categoryTotals[b] - categoryTotals[a]);
+      const sortedCategories = Object.keys(categoryTotals).sort(
+        (a, b) => categoryTotals[b] - categoryTotals[a]
+      );
 
       // Create chart data for total by category
       const categoryChartData = {
@@ -150,26 +151,20 @@ const BTotals = () => {
         datasets: [
           {
             label: 'Total by Category',
-            data: sortedCategories.map(category => categoryTotals[category]),
+            data: sortedCategories.map((category) => categoryTotals[category]),
             borderColor: 'rgb(54, 162, 235)',
-            tension: 0.1
-          }
-        ]
+            tension: 0.1,
+          },
+        ],
       };
       setCategoryChartData(categoryChartData);
     }
   }, [csvData]);
 
-
   return (
     <div>
       <label htmlFor="csv-upload">
-        <Input
-          accept=".csv"
-          id="csv-upload"
-          type="file"
-          onChange={handleFileUpload}
-        />
+        <Input accept=".csv" id="csv-upload" type="file" onChange={handleFileUpload} />
         <Button variant="contained" component="span">
           Upload CSV
         </Button>
@@ -179,35 +174,25 @@ const BTotals = () => {
         <>
           <Box mt={2} mb={2}>
             <Typography>
-              Total rows: {summary.total}, 
-              Total Valid rows: {summary.valid}, 
-              Total Invalid rows: {summary.invalid}
+              Total rows: {summary.total}, Total Valid rows: {summary.valid}, Total Invalid rows: {summary.invalid}
             </Typography>
           </Box>
-          <Button 
-            variant="contained" 
-            onClick={() => setShowChart(!showChart)} 
+          <Button
+            variant="contained"
+            onClick={() => setShowChart(!showChart)}
             style={{ marginBottom: '20px', marginRight: '20px' }}
           >
-            {showChart ? 'Hide Chart' : 'Show Months Chart'}
-          </Button>
-          <Button 
-            variant="contained" 
-            onClick={() => setShowChart(!showChart)} 
-            style={{ marginBottom: '20px' }}
-          >
-            Show Category Chart
+            {showChart ? 'Hide Charts' : 'Show Charts'}
           </Button>
 
-          {showChart && chartData && (
-            <Box mb={2} style={{ width: '100%', height: '400px' }}>
-              <Line data={chartData} options={{ maintainAspectRatio: false }} />
-            </Box>
-          )}
-
-          {showChart && categoryChartData && (
-            <Box mb={2} style={{ width: '100%', height: '400px' }}>
-              <Line data={categoryChartData} options={{ maintainAspectRatio: false }} />
+          {showChart && chartData && categoryChartData && (
+            <Box mb={2} style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box style={{ width: '48%', height: '400px' }}>
+                <Line data={chartData} options={{ maintainAspectRatio: false }} />
+              </Box>
+              <Box style={{ width: '48%', height: '400px' }}>
+                <Line data={categoryChartData} options={{ maintainAspectRatio: false }} />
+              </Box>
             </Box>
           )}
 
@@ -221,7 +206,7 @@ const BTotals = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {csvData.slice(1).map((row, rowIndex) => (
+                {csvData.slice(1).filter(row => row[row.length - 1] === 'Invalid').map((row, rowIndex) => (
                   <TableRow key={rowIndex}>
                     {row.map((cell, cellIndex) => (
                       <TableCell key={cellIndex}>{cell}</TableCell>
@@ -238,3 +223,4 @@ const BTotals = () => {
 };
 
 export default BTotals;
+
