@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/bbird/static/css/main.f855e6bc.css",
+    "main.js": "/bbird/static/js/main.396df2a2.js",
+    "static/js/453.423b7283.chunk.js": "/bbird/static/js/453.423b7283.chunk.js",
+    "index.html": "/bbird/index.html",
+    "main.f855e6bc.css.map": "/bbird/static/css/main.f855e6bc.css.map",
+    "main.396df2a2.js.map": "/bbird/static/js/main.396df2a2.js.map",
+    "453.423b7283.chunk.js.map": "/bbird/static/js/453.423b7283.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f855e6bc.css",
+    "static/js/main.396df2a2.js"
+  ]
+}
