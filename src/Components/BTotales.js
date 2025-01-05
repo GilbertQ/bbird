@@ -38,12 +38,13 @@ const Input = styled('input')({
   display: 'none',
 });
 
-const BTotals = () => {
+const BTotales = () => {
   const [csvData, setCsvData] = useState([]);
   const [summary, setSummary] = useState({ total: 0, valid: 0, invalid: 0 });
   const [showChart, setShowChart] = useState(false);
   const [chartData, setChartData] = useState(null);
   const [categoryChartData, setCategoryChartData] = useState(null);
+  const [groupedData, setGroupedData] = useState({});
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -104,24 +105,26 @@ const BTotals = () => {
 
   useEffect(() => {
     if (csvData.length > 1) {
+      // Group data by month
+      const grouped = {};
+      csvData.slice(1).forEach((row) => {
+        const date = new Date(row[0].replace(/\./g, '-'));
+        const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        if (!grouped[month]) grouped[month] = [];
+        grouped[month].push(row);
+      });
+      setGroupedData(grouped);
+
       // Calculate monthly totals
       const monthlyTotals = {};
       csvData.slice(1).forEach((row) => {
-        // Split the date string into components
-        const [year, month, day] = row[0].split('.');
-        
-        // Create the month key in YYYY-MM format
-        const monthKey = `${year}-${month.padStart(2, '0')}`;
-        
-        // Parse the price
+        const date = new Date(row[0].replace(/\./g, '-'));
+        const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         const price = parseFloat(row[2]);
-        
-        // Add to monthly totals if price is valid
         if (!isNaN(price)) {
-          monthlyTotals[monthKey] = (monthlyTotals[monthKey] || 0) + price;
+          monthlyTotals[month] = (monthlyTotals[month] || 0) + price;
         }
       });
-      
 
       // Create chart data for total by month
       const sortedMonths = Object.keys(monthlyTotals).sort();
@@ -204,31 +207,35 @@ const BTotals = () => {
             </Box>
           )}
 
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  {csvData[0].map((header, index) => (
-                    <TableCell key={index}>{header}</TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {csvData.slice(1).map((row, rowIndex) => (
-                  <TableRow key={rowIndex}>
-                    {row.map((cell, cellIndex) => (
-                      <TableCell key={cellIndex}>{cell}</TableCell>
+          {Object.keys(groupedData).map((month) => (
+            <div key={month}>
+              <Typography variant="h6" mt={2}>{month}</Typography>
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      {csvData[0].map((header, index) => (
+                        <TableCell key={index}>{header}</TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {groupedData[month].map((row, rowIndex) => (
+                      <TableRow key={rowIndex}>
+                        {row.map((cell, cellIndex) => (
+                          <TableCell key={cellIndex}>{cell}</TableCell>
+                        ))}
+                      </TableRow>
                     ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </div>
+          ))}
         </>
       )}
     </div>
   );
 };
 
-export default BTotals;
-
+export default BTotales;
